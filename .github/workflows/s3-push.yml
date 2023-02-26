@@ -1,0 +1,28 @@
+name: S3 test push
+
+on:
+  push:
+    branches:
+      - s3test
+
+jobs:
+  upload:
+    name: S3 Push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: s3test
+
+      - name: Upload test file to S3
+        uses: jakejarvis/s3-sync-action@master
+        with:
+          args: --acl public-read --delete
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: eu-west-2
+          AWS_S3_BUCKET: untax-app
+          SOURCE_DIR: s3-test
