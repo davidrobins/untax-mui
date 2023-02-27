@@ -1,0 +1,51 @@
+name: Deploy to Cloud Functions
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@main
+        with:
+          project_id: 500714736977
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      - name: Install Node.js and npm
+        uses: actions/setup-node@v1
+        with:
+          node-version: 14.x
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Build for production
+        run: yarn run build
+
+      - name: Archive build artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: build-artifacts
+          path: .next
+
+      - name: Deploy to Cloud Functions
+        uses: google-github-actions/deploy-cloud-functions@main
+        with:
+          project_id: 500714736977
+          name: untax-app
+          source: storage://untax/build-artifacts.zip
+          runtime: nodejs14
+          serviceAccountEmail: untax-app@untax-379109.iam.gserviceaccount.com
+          trigger: http
+          region: europe-west2
+          memory: 128MB
+          maxInstances: 1
+          environmentVariables: |
+            NODE_ENV=production

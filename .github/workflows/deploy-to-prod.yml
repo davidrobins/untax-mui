@@ -3,7 +3,7 @@ name: Deploy Next.js app to AWS Lambda
 on:
   push:
     branches:
-      - main
+      - never
 
 jobs:
   deploy:
