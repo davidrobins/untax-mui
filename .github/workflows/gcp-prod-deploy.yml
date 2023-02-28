@@ -35,6 +35,9 @@ jobs:
           name: build-artifacts
           path: .next
 
+      - name: Application default login
+        run: gcloud auth application-default login
+
       - name: Deploy to Cloud Functions
         uses: google-github-actions/deploy-cloud-functions@main
         with:
